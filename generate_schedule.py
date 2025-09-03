@@ -45,7 +45,7 @@ def main():
             stroke_width=preset.style.stroke_width,
             stroke_fill=preset.style.stroke_fill,
             align="left",
-            anchor="nw",
+            anchor="lt",
         )
     base.save(args.output)
     print("saved", args.output)
