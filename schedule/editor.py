@@ -4,8 +4,9 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 from typing import Optional, Tuple, List
 import os
 import datetime as dt
+import json
 
-from .models import TelopStyle, TelopItem
+from .models import TelopStyle, TelopItem, SchedulePreset
 from .fontdb import FontDB
 
 class TelopEditor(tk.Tk):
@@ -157,6 +158,7 @@ class TelopEditor(tk.Tk):
         # 位置リセット/保存
         tk.Button(right, text="位置を初期化", command=self._reset_positions).pack(fill=tk.X, pady=(10, 4))
         tk.Button(right, text="画像として保存…", command=self._export_image).pack(fill=tk.X)
+        tk.Button(right, text="プリセット保存…", command=self._save_preset).pack(fill=tk.X, pady=(4,0))
 
         # ヒント
         hint = (
@@ -235,6 +237,46 @@ class TelopEditor(tk.Tk):
             messagebox.showerror("保存エラー", f"保存に失敗しました\n{e}")
             return
         messagebox.showinfo("完了", "画像を保存しました。")
+
+    def _save_preset(self):
+        if self.base_image is None:
+            messagebox.showwarning("未読み込み", "まずベース画像を開いてください。")
+            return
+        if self.mode_var.get() != "weekly":
+            messagebox.showwarning("週次モードのみ", "プリセット保存は週次モードで使用します。")
+            return
+        if not self._ensure_font_path():
+            messagebox.showwarning("フォント未選択", "フォントを選択してください。")
+            return
+
+        positions = [self._preview_to_image_xy(it.pos) for it in self.week_items]
+        preset = SchedulePreset(
+            base_image=self.base_image_path or "",
+            style=TelopStyle(
+                family=self.style.family,
+                font_path=self.style.font_path,
+                font_size=int(self.size_var.get()),
+                fill=self.style.fill,
+                stroke_fill=self.style.stroke_fill,
+                stroke_width=int(self.stroke_width_var.get()),
+                line_spacing=int(self.ls_var.get()),
+            ),
+            positions=positions,
+        )
+        save_path = filedialog.asksaveasfilename(
+            title="プリセット保存",
+            defaultextension=".vsc",
+            filetypes=[("Preset", "*.vsc"), ("All", "*.*")],
+        )
+        if not save_path:
+            return
+        try:
+            with open(save_path, "w", encoding="utf-8") as f:
+                json.dump(preset.to_dict(), f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            messagebox.showerror("保存エラー", f"保存に失敗しました\n{e}")
+            return
+        messagebox.showinfo("完了", "プリセットを保存しました。")
 
     # ---------------- モード/テキスト ----------------
     def _mode_changed(self):
