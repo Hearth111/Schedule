@@ -54,11 +54,15 @@ class TelopEditor(tk.Tk):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
+        # 左右を調節可能なパネルで分割
+        paned = tk.PanedWindow(self, orient=tk.HORIZONTAL)
+        paned.grid(row=0, column=0, sticky="nsew")
+
         # 左: キャンバス
-        left = tk.Frame(self)
-        left.grid(row=0, column=0, sticky="nsew")
+        left = tk.Frame(paned)
         left.rowconfigure(0, weight=1)
         left.columnconfigure(0, weight=1)
+        paned.add(left, stretch="always")
 
         self.canvas = tk.Canvas(left, bg="#2f2f2f", highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky="nsew")
@@ -68,8 +72,12 @@ class TelopEditor(tk.Tk):
         self.canvas.bind("<ButtonRelease-1>", self._on_mouse_up)
 
         # 右: コントロール
-        right = tk.Frame(self, padx=10, pady=10)
-        right.grid(row=0, column=1, sticky="ns")
+        right = tk.Frame(paned, padx=10, pady=10)
+        paned.add(right, stretch="always")
+
+        # 初期比率を1:1に設定
+        self.update_idletasks()
+        paned.sashpos(0, paned.winfo_width() // 2)
 
         # 画像
         tk.Label(right, text="画像").pack(anchor=tk.W)
