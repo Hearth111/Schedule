@@ -219,7 +219,7 @@ class TelopEditor(tk.Tk):
                 align="left",
                 stroke_width=stroke_w,
                 stroke_fill=self.style.stroke_fill,
-                anchor="nw",
+                anchor="lt",
             )
 
         suggested = self._suggest_filename()
@@ -419,13 +419,13 @@ class TelopEditor(tk.Tk):
             # テキストのサイズを取得
             text = it.text if it.text else " "
             bbox = ImageDraw.Draw(Image.new("RGBA", (1, 1))).multiline_textbbox(
-                (0, 0), text, font=font, spacing=spacing, align="left", stroke_width=stroke_w, anchor="nw")
+                (0, 0), text, font=font, spacing=spacing, align="left", stroke_width=stroke_w, anchor="lt")
             w = max(1, bbox[2] - bbox[0])
             h = max(1, bbox[3] - bbox[1])
             img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
             d = ImageDraw.Draw(img)
             d.multiline_text((0, 0), text, font=font, fill=self.style.fill, spacing=spacing,
-                             align="left", stroke_width=stroke_w, stroke_fill=self.style.stroke_fill, anchor="nw")
+                             align="left", stroke_width=stroke_w, stroke_fill=self.style.stroke_fill, anchor="lt")
             ph = ImageTk.PhotoImage(img)
             x, y = it.pos
             self.canvas.create_image(x, y, image=ph, anchor="nw", tags=("telop", f"telop_{idx}"))
