@@ -12,7 +12,7 @@ if platform.system() == "Windows":
             pass
 
 from .fontdb import FontDB
-from .models import TelopStyle, TelopItem
+from .models import TelopStyle, TelopItem, SchedulePreset
 from .editor import TelopEditor
 
-__all__ = ["FontDB", "TelopStyle", "TelopItem", "TelopEditor"]
+__all__ = ["FontDB", "TelopStyle", "TelopItem", "SchedulePreset", "TelopEditor"]
